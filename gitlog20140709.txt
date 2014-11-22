@@ -1,0 +1,152 @@
+commit d558299f3d1837a21ff3989bdf4a0dfe3a0e4f46
+Author: zbiao <zbiao@bonovo.cn>
+Date:   Mon Jul 7 15:23:45 2014 +0800
+
+    modify mmc 's mmc_start_host()
+
+commit 5ff72317762afbc806b80196f5cd464d1df5e98d
+Author: zbiao <zbiao@bonovo.cn>
+Date:   Fri Jul 4 14:59:07 2014 +0800
+
+    add logo_linux_newsmy_800x600_clut224.ppm file
+
+commit 7d4fb025e55d421be4ab78f0fa024c1c0292085c
+Merge: d574337 7b3da67
+Author: myu <myu@bonovo.cn>
+Date:   Wed Jul 2 10:45:55 2014 +0800
+
+    Merge branch 'rk3188-box' of git://192.168.1.80/kk4.4.2-rk/rk/kernel into rk3188-box
+
+commit d57433786cf48d26ec01024fd1489e454da9fbee
+Author: hjc <hjc@rock-chips.com>
+Date:   Sat May 31 15:01:16 2014 +0800
+
+    rk fb: fix compile warning
+
+commit afa05e511ceba06ad7fce6d548a3c4afcbf9ef74
+Author: hjc <hjc@rock-chips.com>
+Date:   Mon Apr 28 12:35:25 2014 +0800
+
+    rk292x lcdc: fix compile error
+
+commit 914e563d343fe9ed44e4c1c40864af49228157d7
+Author: hjc <hjc@rock-chips.com>
+Date:   Tue Apr 15 18:49:27 2014 +0800
+
+    rk fb: add support fence function
+
+commit 7b3da676c78242e57b01830b6f3221a3e1ddbc58
+Author: zbiao <zbiao@bonovo.cn>
+Date:   Mon Jun 30 20:10:46 2014 +0800
+
+    resolve conflict after repo sync
+
+commit d5e2e97d782296fcd76cd055510c0ab79c2e9d72
+Merge: 0564b3f 9b3bfb1
+Author: zbiao <zbiao@bonovo.cn>
+Date:   Mon Jun 30 14:02:33 2014 +0800
+
+    Merge branch 'android-4.4' into rk3188-box
+
+commit 0564b3f36d9f638bb00b908984ac963d97eaa679
+Author: zbiao <zbiao@bonovo.cn>
+Date:   Tue Jun 17 13:25:07 2014 +0800
+
+    add logo_linux_newsmy_1024x600_clut224.ppm and logo_linux_newsmy_800x480_clut224.ppm
+
+commit f3496d594111ee0563d069557a5eb3f19c89580a
+Author: zbiao <zbiao@bonovo.cn>
+Date:   Fri Jun 6 15:24:06 2014 +0800
+
+    modify heart beat send from rk_serial.c to serial_core.c
+
+commit 9b3bfb1657be63fab3d2b9a1ef1cd9b4e1526791
+Author: zyc <zyc@rock-chips.com>
+Date:   Tue Jun 3 17:19:23 2014 +0800
+
+    camera:v.3.0x19:disable cif irq when capture_en disabled
+
+commit 816d76f32931231c41dc45d1e2dedddd6174ccc3
+Author: dalon.zhang <dalon.zhang@rock-chips.com>
+Date:   Wed May 21 18:37:32 2014 +0800
+
+    camera: rk_cam_cif:v0.3.0x17  rk_cam_sensor: v0.1.0x13
+
+commit 0bf40aec10127e65f459e8d09d8f20f0de36b44b
+Author: hjc <hjc@rock-chips.com>
+Date:   Sat May 31 15:01:16 2014 +0800
+
+    rk fb: fix compile warning
+
+commit 7b1a99d924162036eee6185c998ae2266bce77e1
+Author: cw <cw@rock-chips.com>
+Date:   Sat May 31 09:42:57 2014 +0800
+
+    Update stable dvfs table for RK3168
+
+commit e152e8337b2412346dd2e407d11e5e34ae9fb788
+Author: xxh <xxh@rock-chips.com>
+Date:   Tue May 20 14:58:05 2014 +0800
+
+           UPDATE ESP8089 SDIO WIFI driver,Version v2.20:
+           1.improver RF performence
+           2.improve stability when Open/close WIFI
+
+commit d4d42ca8d249f3af0bebb41968a10cb362468b20
+Author: lintao <lintao@rock-chips.com>
+Date:   Tue May 27 16:12:29 2014 +0800
+
+    fs: partitions:
+    	Fix new partitions size limit bug. Make no sense compare sector_t size
+    to PAGE_SIZE, and that will fail partition add when too small part definition in
+    parameter. Now, NO LIMIT for partition size.
+
+commit 0276fd71ef3f931af0bf303d0b36021f5cfff95f
+Author: xuhuicong <xhc@rock-chips.com>
+Date:   Tue Nov 19 11:25:32 2013 +0800
+
+    cw2015 battery: when the capacity is error reboot the voltameter chips
+
+commit 2da8628edfec310eec2ca2472980509222b711d7
+Author: lintao <lintao@rock-chips.com>
+Date:   Mon May 26 13:53:45 2014 +0800
+
+    mmc: host: rk29_sdmmc: fix conflict spinlock bug in emmc shutdown flow
+
+commit 35afd295857aefd5143f3a2e76161f9b72028e5c
+Author: lintao <lintao@rock-chips.com>
+Date:   Thu May 15 11:23:13 2014 +0800
+
+    rk29_sdmmc: add sdio irq for mmc0
+
+commit 323eae8311071db8a9953eedf67ab034cd2f97a5
+Author: zbiao <zbiao@bonovo.cn>
+Date:   Fri May 16 16:48:04 2014 +0800
+
+    1.add bonovo's protocal;
+    2.add bonovohandle driver;
+    3.modify touch screen driver(rk29_i2c_goodix);
+    4.add key define in input subsystem;
+    5.make system never sleep(modify suspend.c);
+    6.sync wince time;
+    7.optime bt power(independent from wifi power).
+
+commit 2d35ee6efa06a79232daf6920ac48b9f014b2a2d
+Merge: a3d614f 9278378
+Author: zbiao <zbiao@bonovo.cn>
+Date:   Wed May 14 14:17:27 2014 +0800
+
+    Merge branch 'rk3188-box' of git://192.168.1.80/kk4.4.2-rk/rk/kernel into rk3188-box
+
+commit 927837873adfa2247a8d364d929770b3df8202a1
+Author: dzwei <dzwei@bonovo.cn>
+Date:   Wed May 14 13:43:01 2014 +0800
+
+    Add bonovo_rk3188_defconfig
+
+commit a3d614ff4e28b2432aec6d48af4344456f1c4dce
+Merge: 78790f0 8caf725
+Author: zbiao <zbiao@bonovo.cn>
+Date:   Wed May 14 11:05:04 2014 +0800
+
+    Merge branch 'android-4.4' into rk3188-box
