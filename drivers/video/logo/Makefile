@@ -19,6 +19,7 @@ obj-$(CONFIG_LOGO_M32R_CLUT224)		+= logo_m32r_clut224.o
 obj-$(CONFIG_LOGO_G3_CLUT224)		+= logo_g3_clut224.o
 obj-$(CONFIG_LOGO_LINUX_800x480_CLUT224)        += logo_linux_800x480_clut224.o
 obj-$(CONFIG_LOGO_LINUX_NEWSMY_1024x600_CLUT224)+= logo_linux_newsmy_1024x600_clut224.o
+obj-$(CONFIG_LOGO_LINUX_AMPLIFIED_1024x600_CLUT224)+= logo_linux_amplified_1024x600_clut224.o
 obj-$(CONFIG_LOGO_LINUX_BMP_SUNSET)	+= logo_sunset_bmp.o
 obj-$(CONFIG_LOGO_LINUX_BMP_ANDROID)     += logo_android_bmp.o
 obj-$(CONFIG_LOGO_LOWERPOWER_WARNING)   += logo_linux_lowerpower_clut224.o

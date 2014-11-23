@@ -107,6 +107,11 @@ config LOGO_LINUX_NEWSMY_1024x600_CLUT224
 	depends on SCREEN_BONOVO_1024X600
 	default n
 
+config LOGO_LINUX_AMPLIFIED_1024x600_CLUT224
+    bool "Standard 224-color 1024x600 Android:Amplified logo"
+	depends on SCREEN_BONOVO_1024X600
+	default n
+
 menuconfig LOGO_LINUX_BMP
         bool "Bmp logo support"
 	default n
