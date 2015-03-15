@@ -12,6 +12,47 @@ config IOSCHED_NOOP
 	  that do their own scheduling and require only minimal assistance from
 	  the kernel.
 
+config IOSCHED_ROW
+	tristate "ROW I/O scheduler"
+	default y
+	---help---
+	ROW stands for "READ Over WRITE"which is the main requests dispatch policy of this algorithm.
+	The ROW IO scheduler was developed with the mobile devices needs in mind. In mobile devices
+	we favor user experience upon everything else,thus we want to give READ IO requests as much
+	priority as possible. In mobile devices we won¡¯t have as much parallel threads as on
+	desktops. Usually it¡¯s a single thread or at most 2 simultaneous working threads for read &
+	write. Favoring READ requests over WRITEs decreases the READ latency greatly.
+	The main idea of the ROW scheduling policy is: If there are READ requests in pipe - dispatch
+	them but don't starve the WRITE requests too much. Bellow you¡¯ll find a small comparison of
+	ROW to existing schedulers. The test that was run for these measurements is parallel read and
+	write.
+
+config IOSCHED_SIO
+	tristate "Simple I/O scheduler"
+	default y
+	---help---
+          Simple I/O scheduler aims to keep minimum overhead to achieve low
+	  latency to serve I/O requests. No priority queues concepts, but only
+	  basic merging. Sio is a mix between noop and deadline. No reordering
+          or sorting of requests.
+
+          Adv: simple, reliable; minimized starvation of requests
+	  Dis: slow random-read speeds on flash drives, compared to others;
+	       sequential-read speeds on flash drives not so good
+
+config IOSCHED_VR
+	tristate "V(R) I/O scheduler"
+	default y
+	---help---
+	  Unlike other schedulers, synchronous and asynchronous requests are
+	  not treated separately, instead a deadline is imposed for fairness.
+	  The next request to be served is based on its distance from last
+    	  request.
+
+	  Adv: Best for benchmarking
+	  Dis: performance fluctuation results in below-average performance
+               at times; least reliable/most unstable
+
 config IOSCHED_DEADLINE
 	tristate "Deadline I/O scheduler"
 	default y
@@ -53,6 +94,18 @@ choice
 	config DEFAULT_DEADLINE
 		bool "Deadline" if IOSCHED_DEADLINE=y
 
+	config DEFAULT_ROW
+		bool "ROW" if IOSCHED_ROW=y
+
+	config DEFAULT_SIO
+		bool "SIO" if IOSCHED_SIO=y
+
+	config DEFAULT_VR
+		bool "VR" if IOSCHED_VR=y
+
+	config DEFAULT_FIOPS
+		bool "FIOPS" if IOSCHED_FIOPS=y
+
 	config DEFAULT_CFQ
 		bool "CFQ" if IOSCHED_CFQ=y
 
@@ -64,7 +117,10 @@ endchoice
 config DEFAULT_IOSCHED
 	string
 	default "deadline" if DEFAULT_DEADLINE
-	default "cfq" if DEFAULT_CFQ
+	default "row" if DEFAULT_ROW
+	default "sio" if DEFAULT_SIO
+	default "vr" if DEFAULT_VR
+    default "cfq" if DEFAULT_CFQ
 	default "noop" if DEFAULT_NOOP
 
 endmenu
