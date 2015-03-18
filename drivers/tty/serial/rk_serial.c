@@ -905,7 +905,7 @@ static void serial_rk_start_dma_rx(struct work_struct *work)
 
 #define POINT_POWER_OFF			0x01
 #define POINT_BOX_ALIVE			0x02
-#define POINT_SYS_VO		        0x07
+#define POINT_SYS_VOL		        0x07
 #define POINT_TOUCH_DATA		0x10
 #define POINT_TOUCH_UP			0x11
 #define POINT_WINCE_KEYDOWN		0x20
