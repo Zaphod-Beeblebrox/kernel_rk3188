@@ -79,8 +79,12 @@
 *		1.in some case, set uart rx as gpio interrupt to wake up arm, when arm suspends 
 *v1.6 : 2013-12-23
 *		1.clear receive time out interrupt request in irq handler
+*v1.7 : 2015-03-17
+*		1. Implement the handling of RDS data.
+*		Dwaine
 */
-#define VERSION_AND_TIME  "rk_serial.c v1.6 2013-12-23"
+
+#define VERSION_AND_TIME  "rk_serial.c v1.7 2015-03-17"
 
 #define PORT_RK		90
 #define UART_USR	0x1F	/* UART Status Register */
@@ -896,31 +900,32 @@ static void serial_rk_start_dma_rx(struct work_struct *work)
 //*************************************************************************//
 #define USE_ONE_BUFF			0
 
-#define PRINTLOG				0
+#define PRINTLOG			0
 #define FRAME_LEN_MIN			7
 
 #define POINT_POWER_OFF			0x01
 #define POINT_BOX_ALIVE			0x02
-#define POINT_SYS_VOL           0x07
+#define POINT_SYS_VO		        0x07
 #define POINT_TOUCH_DATA		0x10
 #define POINT_TOUCH_UP			0x11
 #define POINT_WINCE_KEYDOWN		0x20
 #define POINT_WINCE_KEYUP		0x21
-#define POINT_ADVANCE_KEY       0x22
+#define POINT_ADVANCE_KEY       	0x22
 #define POINT_GPS_DATA			0x30
 #define POINT_DATE_TIME 		0x40
-#define POINT_WINCE_BACKLIGHT	0x50
+#define POINT_WINCE_BACKLIGHT		0x50
 #define POINT_BOX_WAKEUP		0x60
 #define POINT_SOUND_CHANNEL		0x70
-#define POINT_FM_STATUS         0x71
-#define POINT_BLUETOOTH_INFO    0x72
-#define POINT_DVD_INFO          0x73
-#define POINT_CAN_INFO          0x74
-#define POINT_MCU_STATUS        0x75
-#define POINT_MCU_SERAIL        0x76
-#define POINT_MCU_FLASH_STATUS  0x05
-#define POINT_MCU_REQUEST       0x06
-#define POINT_MCU_VERSION       0x03
+#define POINT_FM_STATUS         	0x71
+#define POINT_BLUETOOTH_INFO    	0x72
+#define POINT_DVD_INFO          	0x73
+#define POINT_CAN_INFO          	0x74
+#define POINT_MCU_STATUS        	0x75
+#define POINT_MCU_SERAIL        	0x76
+#define POINT_MCU_FLASH_STATUS  	0x05
+#define POINT_MCU_REQUEST       	0x06
+#define POINT_MCU_VERSION       	0x03
+#define POINT_RDS_DATA	        	0x76
 
 
 #define UART3_SEND_LOG 0
@@ -1499,14 +1504,14 @@ void receive_int_char(unsigned char ch)
 }
 #else
 //=============================================================================
-// ÏÂÃæµÄ´úÂë¸ù¾İÉÏÃæµÄ´úÂë½øĞĞ¸ÄĞ´ºÍÓÅ»¯
-// ×î³õ½ÓÊÕÊı¾İ²¢²éÕÒÊı¾İÖ¡Ê±,ÓÅÏÈ¿¼ÂÇÁ¬ĞøË«0xFA,¼´ËÑË÷µ½Á¬ĞøË«0xFA¼´ÈÏÎªÊÇ
-// Ò»Ö¡µÄ¿ªÊ¼,µ«ÕâÑùµÄ½âÎöÓĞÒ»¸öÎÊÌâ:¼´Êı¾İÖ¡ÖĞ°üº¬Á¬ĞøË«0xFA,Ôò»á°ÑÊı¾İÖĞµÄ
-// Ë«0xFAÎóÈÏÎªÊÇĞÂÒ»Ö¡µÄ¿ªÊ¼,µ¼ÖÂÎŞ·¨ÕıÈ·½ÓÊÕº¬ÓĞË«0xFAµÄÊı¾İÖ¡
-// Õë¶ÔÕâ¸öbug,ÕÅ±ë¶ÔÔ­ÓĞ´úÂë½øĞĞÁË¸ÄĞ´,¼´ÉÏÃæµÄ´úÂë
-// ÉÏÃæµÄ´úÂëÒ²ÓĞÒ»¸öÎÊÌâ,¼´µ±Ò»¸öÊı¾İÖ¡ÓĞ²¿·ÖÊı¾İ¶ªÊ§Ê±,¸ÃÊı¾İÖ¡ºóĞøµÄÄÇ¸ö
-// Êı¾İÖ¡ÖĞµÄÊı¾İ»á±»µ±×÷Ç°Ò»Ö¡µÄÊı¾İÀ´³öÀ´.ÕâÑùÒ»µ©ÓĞÒ»Ö¡Êı¾İ²»È«,»áµ¼ÖÂ
-// ºóĞøµÄÊı¾İÖ¡Ò²ÊÜÓ°Ïì
+// ä¸‹é¢çš„ä»£ç æ ¹æ®ä¸Šé¢çš„ä»£ç è¿›è¡Œæ”¹å†™å’Œä¼˜åŒ–
+// æœ€åˆæ¥æ”¶æ•°æ®å¹¶æŸ¥æ‰¾æ•°æ®å¸§æ—¶,ä¼˜å…ˆè€ƒè™‘è¿ç»­åŒ0xFA,å³æœç´¢åˆ°è¿ç»­åŒ0xFAå³è®¤ä¸ºæ˜¯
+// ä¸€å¸§çš„å¼€å§‹,ä½†è¿™æ ·çš„è§£ææœ‰ä¸€ä¸ªé—®é¢˜:å³æ•°æ®å¸§ä¸­åŒ…å«è¿ç»­åŒ0xFA,åˆ™ä¼šæŠŠæ•°æ®ä¸­çš„
+// åŒ0xFAè¯¯è®¤ä¸ºæ˜¯æ–°ä¸€å¸§çš„å¼€å§‹,å¯¼è‡´æ— æ³•æ­£ç¡®æ¥æ”¶å«æœ‰åŒ0xFAçš„æ•°æ®å¸§
+// é’ˆå¯¹è¿™ä¸ªbug,å¼ å½ªå¯¹åŸæœ‰ä»£ç è¿›è¡Œäº†æ”¹å†™,å³ä¸Šé¢çš„ä»£ç 
+// ä¸Šé¢çš„ä»£ç ä¹Ÿæœ‰ä¸€ä¸ªé—®é¢˜,å³å½“ä¸€ä¸ªæ•°æ®å¸§æœ‰éƒ¨åˆ†æ•°æ®ä¸¢å¤±æ—¶,è¯¥æ•°æ®å¸§åç»­çš„é‚£ä¸ª
+// æ•°æ®å¸§ä¸­çš„æ•°æ®ä¼šè¢«å½“ä½œå‰ä¸€å¸§çš„æ•°æ®æ¥å‡ºæ¥.è¿™æ ·ä¸€æ—¦æœ‰ä¸€å¸§æ•°æ®ä¸å…¨,ä¼šå¯¼è‡´
+// åç»­çš„æ•°æ®å¸§ä¹Ÿå—å½±å“
 //-----------------------------------------------------------------------------
 // dzwei, 2014-8-1
 //=============================================================================
@@ -1570,8 +1575,8 @@ void receive_int_char(unsigned char ch)
 	{
 		if (ch == 0xFA) 
 		{
-			// Ò»Ğ©±äÁ¿µÄ³õÊ¼»¯ÔÚÕâ¸ö½×¶Î½øĞĞ,ÒòÎªÕâ¸ö½×¶ÎÊÇÊı¾İÖ¡ÅĞ±ğµÄ±Ø¾­
-			// Â·¾¶,Òò´Ë²»ĞèÒªÔÚÆäËûµØ·½¶ÔÕâĞ©±äÁ¿½øĞĞ³õÊ¼»¯
+			// ä¸€äº›å˜é‡çš„åˆå§‹åŒ–åœ¨è¿™ä¸ªé˜¶æ®µè¿›è¡Œ,å› ä¸ºè¿™ä¸ªé˜¶æ®µæ˜¯æ•°æ®å¸§åˆ¤åˆ«çš„å¿…ç»
+			// è·¯å¾„,å› æ­¤ä¸éœ€è¦åœ¨å…¶ä»–åœ°æ–¹å¯¹è¿™äº›å˜é‡è¿›è¡Œåˆå§‹åŒ–
 			uart3_buf.buf[uart3_buf.w_idx][0] = 0xFA;
 			uart3_buf.buf[uart3_buf.w_idx][1] = 0xFA;
 			uart3_buf.flag = 2;
@@ -1821,6 +1826,9 @@ int read_serial_frame(void * pport)
 		case POINT_CAN_INFO:
 			//bonovo_parse_canbus_data(&ptr[5], uart3_buf.buf_len[uart3_buf.r_idx]-7);
 			fill_canbus_buf(&ptr[5], uart3_buf.buf_len[uart3_buf.r_idx]-7);
+			break;
+		case POINT_RDS_DATA:
+			fill_rds_buf(&ptr[5], uart3_buf.buf_len[uart3_buf.r_idx]-7);
 			break;
 		case POINT_MCU_SERAIL:
 			//i = (ptr[3]<<8) + ptr[2] - 7;
