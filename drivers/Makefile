@@ -139,4 +139,5 @@ obj-y		+= bonovo_mcu_update/
 obj-y		+= bonovo_virtual_serial/
 obj-y		+= bonovo_mcu_status/
 obj-y		+= bonovo_canbus/
+obj-y		+= bonovo_rds/
 obj-$(CONFIG_RK_REMOTECTL)   += bonovo_irctl/
