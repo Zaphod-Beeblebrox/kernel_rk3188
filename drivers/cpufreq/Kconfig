@@ -3,8 +3,8 @@ menu "CPU Frequency scaling"
 config CPU_FREQ
 	bool "CPU Frequency scaling"
 	help
-	  CPU Frequency scaling allows you to change the clock speed of 
-	  CPUs on the fly. This is a nice method to save power, because 
+	  CPU Frequency scaling allows you to change the clock speed of
+	  CPUs on the fly. This is a nice method to save power, because
 	  the lower the CPU clock speed, the less power the CPU consumes.
 
 	  Note that this driver doesn't automatically change the CPU
@@ -58,6 +58,54 @@ config CPU_FREQ_DEFAULT_GOV_PERFORMANCE
 	  the frequency statically to the highest frequency supported by
 	  the CPU.
 
+config CPU_FREQ_DEFAULT_GOV_ADAPTIVE
+	bool "adaptive"
+	select CPU_FREQ_GOV_ADAPTIVE
+	select CPU_FREQ_GOV_PERFORMANCE
+	help
+	  This driver adds a dynamic cpufreq policy governor
+	  designed for latency-sensitive workloads and also for demanding
+	  performance.
+	  This governor attempts to reduce the latency of clock
+	  increases so that the system is more responsive to
+	  interactive workloads in loweset steady-state but to
+	  to reduce power consumption in middle operation level level up
+	  will be done in step by step to prohibit system from going to
+	  max operation level.
+
+config CPU_FREQ_DEFAULT_GOV_HYPER
+	bool "hyper"
+	select CPU_FREQ_GOV_HYPER
+	select CPU_FREQ_GOV_PERFORMANCE
+	help
+	  This driver is similar to smartassV2. More aggressive ramping,
+	  so more performance, less battery.
+
+config CPU_FREQ_DEFAULT_GOV_LIONHEART
+	bool "lionheart"
+	select CPU_FREQ_GOV_LIONHEART
+	select CPU_FREQ_GOV_PERFORMANCE
+	help
+	  Intellidemand aka Intelligent Ondemand from Faux is yet another governor that's based on ondemand. Unlike 		  what some users believe, this governor is not the replacement for OC Daemon (Having different governors for 		  sleep and awake). The original intellidemand behaves differently according to GPU usage. When GPU is really 		  busy (gaming, maps, benchmarking, etc) intellidemand behaves like ondemand. When GPU is 'idling' (or 		  moderately busy), intellidemand limits max frequency to a step depending on frequencies available in your 		  device/kernel for saving battery. This is called browsing mode. We can see some 'traces' of interactive 		  governor here. Frequency scale-up decision is made based on idling time of CPU. Lower idling time (<20%) 		  causes CPU to scale-up from current frequency. Frequency scale-down happens at steps=5% of max frequency. 		  (This parameter is tunable only in conservative, among the popular governors)
+	  To sum up, this is an intelligent ondemand that enters browsing mode to limit max frequency when GPU is 		  idling, and (exits browsing mode) behaves like ondemand when GPU is busy; to deliver performance for gaming 	 	  and such. Intellidemand does not jump to highest frequency when screen is off.
+
+config CPU_FREQ_DEFAULT_GOV_LULZACTIVE
+	bool "lulzactive"
+	select CPU_FREQ_GOV_LULZACTIVE
+	select CPU_FREQ_GOV_PERFORMANCE
+	help
+	  This new find from Tegrak is based on Interactive & Smartass governors and is one of the favorites.
+	  Old Version: When workload is greater than or equal to 60%, the governor scales up CPU to next higher step. 		  When workload is less than 60%, governor scales down CPU to next lower step. When screen is off, frequency is 	  locked to global scaling minimum frequency.
+	  New Version: Three more user configurable parameters: inc_cpu_load, pump_up_step, pump_down_step. Unlike 		  older version, this one gives more control for the user. We can set the threshold at which governor decides 		  to scale up/down. We can also set number of frequency steps to be skipped while polling up and down.
+	  When workload greater than or equal to inc_cpu_load, governor scales CPU pump_up_step steps up. When workload 	  is less than inc_cpu_load, governor scales CPU down pump_down_step steps down.
+
+config CPU_FREQ_DEFAULT_GOV_SMARTASS2
+	bool "smartass2"
+	select CPU_FREQ_GOV_SMARTASS2
+	select CPU_FREQ_GOV_PERFORMANCE
+	help
+	  Version 2 of the original smartass governor from Erasmux. Another favorite for many a people. The governor 		  aim for an "ideal frequency", and ramp up more aggressively towards this freq and less aggressive after. It 		  uses different ideal frequencies for screen on and screen off, namely awake_ideal_freq and sleep_ideal_freq. 		  This governor scales down CPU very fast (to hit sleep_ideal_freq soon) while screen is off and scales up 		  rapidly to awake_ideal_freq (500 mhz for GS2 by default) when screen is on. There's no upper limit for 		  frequency while screen is off (unlike Smartass). So the entire frequency range is available for the governor 		  to use during screen-on and screen-off state. The motto of this governor is a balance between performance and 	  battery.
+
 config CPU_FREQ_DEFAULT_GOV_POWERSAVE
 	bool "powersave"
 	depends on EXPERT
@@ -72,7 +120,7 @@ config CPU_FREQ_DEFAULT_GOV_USERSPACE
 	select CPU_FREQ_GOV_USERSPACE
 	help
 	  Use the CPUFreq governor 'userspace' as default. This allows
-	  you to set the CPU frequency manually or when a userspace 
+	  you to set the CPU frequency manually or when a userspace
 	  program shall be able to set the CPU dynamically without having
 	  to enable the userspace governor manually.
 
@@ -87,6 +135,20 @@ config CPU_FREQ_DEFAULT_GOV_ONDEMAND
 	  Be aware that not all cpufreq drivers support the ondemand
 	  governor. If unsure have a look at the help section of the
 	  driver. Fallback governor will be the performance governor.
+
+config CPU_FREQ_DEFAULT_GOV_ONDEMANDX
+	bool "ondemandx"
+	select CPU_FREQ_GOV_ONDEMANDX
+	select CPU_FREQ_GOV_PERFORMANCE
+	help
+	  Basically an ondemand with suspend/wake profiles. This governor is supposed to be a battery
+	  friendly ondemand. When screen is off, max frequency is capped at 500 mhz. Even though
+	  ondemand is the default governor in many kernel and is considered safe/stable, the support
+	  for ondemand/ondemandX depends on CPU
+	  capability to do fast frequency switching which are very low latency frequency transitions.
+	  I have read somewhere that the performance of ondemand/ondemandx were significantly varying
+	  for different i/o schedulers.  This is not true for most of the other governors. I personally
+	  feel ondemand/ondemandx goes best with SIO I/O scheduler.
 
 config CPU_FREQ_DEFAULT_GOV_CONSERVATIVE
 	bool "conservative"
@@ -122,6 +184,95 @@ config CPU_FREQ_GOV_PERFORMANCE
 
 	  If in doubt, say Y.
 
+config CPU_FREQ_GOV_ADAPTIVE
+	tristate "'adaptive' governor"
+	help
+	  This driver adds a dynamic cpufreq policy governor
+	  designed for latency-sensitive workloads and also for demanding
+	  performance.
+	  This governor attempts to reduce the latency of clock
+	  increases so that the system is more responsive to
+	  interactive workloads in loweset steady-state but to
+	  to reduce power consumption in middle operation level level up
+	  will be done in step by step to prohibit system from going to
+	  max operation level.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called cpufreq_adaptive.
+
+	  For details, take a look at linux/Documentation/cpu-freq.
+
+	  If in doubt, say N.
+
+config CPU_FREQ_GOV_HYPER
+	tristate "'hyper' governor"
+	help
+	  This driver is similar to smartassV2. More aggressive ramping,
+	  so more performance, less battery.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called cpufreq_hyper.
+
+	  For details, take a look at linux/Documentation/cpu-freq.
+
+	  If in doubt, say N.
+
+config CPU_FREQ_GOV_LIONHEART
+	tristate "'lionheart' governor"
+	help
+	  Lionheart is a conservative-based governor which is based on samsung's update3 source.
+	  The tunables (such as the thresholds and sampling rate) were changed so the governor behaves
+	  more like the performance one, at the cost of battery as the scaling is very aggressive.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called cpufreq_lionheart.
+
+	  For details, take a look at linux/Documentation/cpu-freq.
+
+	  If in doubt, say N.
+
+config CPU_FREQ_GOV_LULZACTIVE
+	tristate "'lulzactive' governor"
+	help
+	  This new find from Tegrak is based on Interactive & Smartass governors and is one of the
+	  favorites.
+	  Old Version: When workload is greater than or equal to 60%, the governor scales up CPU to
+	  next higher step.  When workload is less than 60%, governor scales down CPU to next lower
+	  step. When screen is off, frequency is locked to global scaling minimum frequency.
+	  New Version: Three more user configurable parameters: inc_cpu_load, pump_up_step,
+	  pump_down_step. Unlike older version, this one gives more control for the user. We can
+	  set the threshold at which governor decides to scale up/down. We can also set number of
+	  frequency steps to be skipped while polling up and down.  When workload greater than or
+	  equal to inc_cpu_load, governor scales CPU pump_up_step steps up. When workload is less
+	  than inc_cpu_load, governor scales CPU down pump_down_step steps down.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called cpufreq_lulzactive.
+
+	  For details, take a look at linux/Documentation/cpu-freq.
+
+	  If in doubt, say N.
+
+config CPU_FREQ_GOV_SMARTASS2
+	tristate "'smartass2' governor"
+	help
+	  Version 2 of the original smartass governor from Erasmux. Another favorite for many a people.
+	  The governor aim for an "ideal frequency", and ramp up more aggressively towards this freq
+	  and less aggressive after. It uses different ideal frequencies for screen on and screen off,
+	  namely awake_ideal_freq and sleep_ideal_freq. This governor scales down CPU very
+	  fast (to hit sleep_ideal_freq soon) while screen is off and scales up rapidly to
+	  awake_ideal_freq (500 mhz for GS2 by default) when screen is on. There's no upper limit for
+	  frequency while screen is off (unlike Smartass). So the entire frequency range is available
+	  for the governor to use during screen-on and screen-off state. The motto of this
+	  governor is a balance between performance and battery.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called cpufreq_smartass2.
+
+	  For details, take a look at linux/Documentation/cpu-freq.
+
+	  If in doubt, say N.
+
 config CPU_FREQ_GOV_POWERSAVE
 	tristate "'powersave' governor"
 	help
@@ -138,7 +289,7 @@ config CPU_FREQ_GOV_USERSPACE
 	help
 	  Enable this cpufreq governor when you either want to set the
 	  CPU frequency manually or when a userspace program shall
-	  be able to set the CPU dynamically, like on LART 
+	  be able to set the CPU dynamically, like on LART
 	  <http://www.lartmaker.nl/>.
 
 	  To compile this driver as a module, choose M here: the
@@ -153,11 +304,29 @@ config CPU_FREQ_GOV_ONDEMAND
 	select CPU_FREQ_TABLE
 	help
 	  'ondemand' - This driver adds a dynamic cpufreq policy governor.
-	  The governor does a periodic polling and 
+	  The governor does a periodic polling and
 	  changes frequency based on the CPU utilization.
 	  The support for this governor depends on CPU capability to
 	  do fast frequency switching (i.e, very low latency frequency
-	  transitions). 
+	  transitions).
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called cpufreq_ondemand.
+
+	  For details, take a look at linux/Documentation/cpu-freq.
+
+	  If in doubt, say N.
+
+config CPU_FREQ_GOV_ONDEMANDX
+	tristate "'ondemandx' cpufreq policy governor"
+	select CPU_FREQ_TABLE
+	help
+	  This driver adds a dynamic cpufreq policy governor.
+	  The governor does a periodic polling and
+	  changes frequency based on the CPU utilization.
+	  The support for this governor depends on CPU capability to
+	  do fast frequency switching (i.e, very low latency frequency
+	  transitions).
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called cpufreq_ondemand.
